@@ -72,7 +72,7 @@ def canny_edge(img, low=20, high=100):
     suppressed = _nms_edge(mag, angle)               # NMS로 엣지 방향 극대값만 남김
     return _hysteresis(suppressed, low, high)        # 이중 임계값으로 최종 엣지 확정
 
-# hough line detection: 기울기와 절편이 아닌 각도와 거리로 했습니다.(이후 명함 특성 활용한 각도비교 등에 유리)
+# hough line detection: k,d의 한계 -> 각도와 거리 Hessian normal form 참고.(이후 명함 특성 활용한 각도비교 등에 유리)
 def hough_lines(edge, rho_step=1.0, theta_step=np.pi/180, threshold=120):
     H, W = edge.shape                                # 이미지 좌상단을 원점으로해서 (0,0)
     D = int(np.ceil(np.hypot(H, W)))                # 최대 ρ값 = 이미지 대각선 길이
@@ -113,7 +113,7 @@ def hough_lines(edge, rho_step=1.0, theta_step=np.pi/180, threshold=120):
     rho_vals   = ((ri_arr - D) * rho_step).astype(np.float32)  # bin 인덱스 -> 실제 ρ 값 복원
     theta_vals = (ti_arr * theta_step).astype(np.float32)       # bin 인덱스 -> 실제 θ 값 복원
 
-    return np.stack([rho_vals, theta_vals], axis=1)[:, None, :]  # cv2.HoughLines와 동일한 (N,1,2) 반환
+    return np.stack([rho_vals, theta_vals], axis=1)[:, None, :]  # (N,1,2) 반환
 
 
 def nms_lines(lines, rho_thresh=100, angle_thresh_deg=18.5):
